@@ -1,55 +1,22 @@
-import { activeEffect } from "../effect/effect";
-let list = new Set()
-export function reactive(params){
-    const proxyObj = new Proxy(params,{
-        get(targer, property, receiver){
-            //list.push(activeEffect);
-            let ref = Reflect.get(targer, property, receiver)
-            return 
-        },
-        set(targer, property, receiver){
-            let result = Reflect.set(targer, property, receiver)
-            list.forEach(fn=>{
-                fn()
-            })
-            return result
-        },
-        deleteProperty(target, key){
-            list.forEach(fn=>{
-                fn()
-            })
-            return Reflect.deleteProperty(target,key)
-        }
-    })
+import { track, trigger } from "../effect/effect";
 
-    return proxyObj;
+// reactive返回传入obj的代理对象，值更新时使app更新
+export function reactive(obj) {
+  return new Proxy(obj, {
+    get(target, key) {
+      const result = Reflect.get(target, key);
+      track(target, key)
+      return result
+    },
+    set(target, key, value) {
+      const result = Reflect.set(target, key, value);
+      trigger(target, key)
+      return result
+    },
+    deleteProperty(target, key) {
+      const result = Reflect.deleteProperty(target, key);
+      trigger(target, key)
+      return result
+    },
+  });
 }
-
-function track(params, key) {
-    // 获取map，查看有没有
-    let depsmap = targetMap.get(params);
-    if(!depsmap) {
-        depsmap = new Map();
-        targetMap.set(params, depsmap);
-    }
-    // 这是一个set
-    let deps = depsmap.get(key);
-    if(!deps) {
-        deps = new Set();
-        depsmap.set(key, deps);
-    }
-    deps.add(activeEffect);
-
-}
-
-function trigger(target, key) {
-    if(targetMap.has(target)) {
-       const deps = targetMap.get(target).get(key);
-        if(deps) {
-            deps.forEach(dep => {
-                dep();
-            })
-        }
-    }
-}
-
