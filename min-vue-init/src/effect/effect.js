@@ -1,10 +1,21 @@
 //effect.js
 export let activeEffect
+const effectStack = []
+
 export function effect(fn, options = {}) {
   // 封装一个effectFn用于扩展功能
   const effectFn = () => {
-    activeEffect = effectFn
-    fn()
+    try{
+      effectStack.push(effectFn);
+      activeEffect = effectFn
+      fn()
+    }finally{
+      effectStack.pop();
+      activeEffect = effectStack[effectStack.length - 1];
+
+    }
+    // activeEffect = effectFn
+    // fn()
   }
   effectFn.options = options // 增加选项以备trigger时使用
   effectFn()
@@ -36,12 +47,15 @@ export function trigger(target, key) {
     const deps = depsMap.get(key)
 
     // 增加scheduler判断
-    deps && deps.forEach(dep => {
-      if (dep.options.scheduler) {
-        dep.options.scheduler(dep)
-      } else {
-        dep()
-      }
-    })
+    if(deps){
+      deps.forEach(dep => {
+        if (dep.options.scheduler) {
+          dep.options.scheduler(dep)
+        } else {
+          dep()
+        }
+      })
+    }
+    
   }
 }
