@@ -14,6 +14,15 @@ const rendererOptions = {
     },
     setElementText(el,text){
         el.textContent = text
+    },
+    createElement(tag){
+        return document.createElement(tag)
+    },
+    remove(el){
+        const parent = el.parentNode
+        if (parent) {
+            parent.removeChild(el)
+        }
     }
 }
 
@@ -27,5 +36,11 @@ export function createApp(rootComponent){
     //console.log(rootComponent)
     //renderer全局单例
     //const renderer = createRenderer(options)
-    return ensureRenderer().createApp(rootComponent)
+    const app = ensureRenderer().createApp(rootComponent);
+    const mount = app.mount
+    app.mount = function(selectorOrContainer){
+        const container = document.querySelector(selectorOrContainer)
+        mount(container)
+    }
+    return app;
 }
