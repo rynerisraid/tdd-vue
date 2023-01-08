@@ -33,6 +33,10 @@ function parseChildren(context, stack) {
         // 开始标签
         node = parseElement(context, stack)
       }
+    }else if (/[a-z]/i.test(context.source[1])) {
+      // 开始标签
+      node = parseElement(context, stack)
+
     } else if (context.source.startsWith('{{')) {
       // 插值文本
       node = parseInterpolation(context)
@@ -100,9 +104,13 @@ function parseTag(context, type = 'start') {
       : /^<\/([a-z][^\t\r\n\f />]*)/i
   const match = pattern.exec(context.source)
   // 匹配成功，第一个分组的值为标签名称
-  const tag = match[1]
-  // 消费匹配部分全部内容，例如<div
-  context.advance(match[0].length)
+  let tag
+  if(match){
+    tag = match[1]
+    // 消费匹配部分全部内容，例如<div
+    context.advance(match[0].length)
+  }
+
 
   // 消费标签后面空格
   // context.advanceSpaces()

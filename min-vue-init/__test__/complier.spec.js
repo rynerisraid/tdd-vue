@@ -1,5 +1,5 @@
-import { parse} from "../src/complier/parse"
-
+// import { parse} from "../src/complier/parse"
+import { parse } from "../src/complier/c_parser";
 
 /**
  * complier:

@@ -6,8 +6,14 @@ export function reactive(target){
         return target;
     }
 
+    if(isReactive(target)){
+        return target
+    }
     const proxy = new Proxy(target,{
         get(target,key,receiver){
+            if(key==='__isReactive'){
+                return true
+            }
             const res = Reflect.get(target,key,receiver);
             //在get中收集依赖
             track(target,key);
@@ -22,4 +28,10 @@ export function reactive(target){
     })
 
     return proxy;
+}
+
+
+export function isReactive(target){
+    return target && target.__isReactive;
+
 }
