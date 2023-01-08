@@ -1,3 +1,9 @@
+/**
+ * 
+ * @param {*} 
+ * @returns 解析后的语法树
+ */
+
 export function parse(template){
 
     //上下文
@@ -182,7 +188,8 @@ function parseAttrs(context) {
 
     }
 
-
+    
     return props
+    
     
 }
