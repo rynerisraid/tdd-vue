@@ -10,7 +10,7 @@ export default defineComponent({
         }
     },
 
-    setup(props, { slots }){
+    setup(props){
         
 
         return ()=> {
@@ -21,7 +21,8 @@ export default defineComponent({
                 {
                     href: '#' + to,
                 },
-                slots.default()
+                'router-link'
+                // slots.default()
             );
         };
     },
