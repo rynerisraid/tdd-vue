@@ -185,11 +185,9 @@ function parseAttrs(context) {
             })
         }
         context.advanceSpaces()
-
+        
     }
 
-    
     return props
-    
     
 }

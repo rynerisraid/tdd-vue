@@ -1,11 +1,13 @@
 <html>
 <body>
-<div id=”app“>
-    <input v-model="data.message" />
-    <button @click="reverse">{{data.message}}</button>
-</div>
+<div id="app"><button @click="reverse">{{data.message}}</button></div>
 
+<script src="../build/reactivity.js"></script>
+<script src="../build/Complier.js"></script>
 <script>
+    const { reactive, effect } = Reactivity
+    const { compile } = Complier
+    // 数据响应式处理
     const data = reactive({
         message: 'Hello Vue 3!!'
     })
@@ -15,6 +17,7 @@
 
 
     const template = app.innerHTML
+    console.log(app.innerHTML)
     const render = compile(template)
     effect(render);
 

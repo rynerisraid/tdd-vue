@@ -1,5 +1,6 @@
-// import { parse} from "../src/complier/parse"
-import { parse } from "../src/complier/c_parser";
+import { parse} from "../src/complier/parse";
+//import { parse } from "../src/complier/c_parser";
+import { generate } from "../src/complier/generate";
 
 /**
  * complier:
@@ -9,6 +10,7 @@ import { parse } from "../src/complier/c_parser";
  */
 
 describe('complier', () => {
+
     it('parse element', () => {
         const template = '<div></div>'
         // parse 解析抽象语法树
@@ -24,7 +26,15 @@ describe('complier', () => {
             isUnary: false
         })
     });
-    
+
+    it('parse complicated tag',()=>{
+      const template = `<input v-model="data.message"/>
+      <button @click="reverse">{{data.message}}</button>
+      `
+      const ast = parse(template)
+      console.log(ast)
+    })
+
     it("parse unary element", () => {
         const template = "<img/>";
         const ast = parse(template);
@@ -81,4 +91,103 @@ describe('complier', () => {
         });
     });
 
+
+    it('parse plain text', () => {
+      const template = '<div>some text</div>'
+      const ast = parse(template)
+      expect(ast[0]).toEqual({
+        tag: 'div',
+        type: 'Element',
+        props: [],
+        children: [
+          {
+            type: 'Text',
+            content: 'some text'
+          }
+        ],
+        isUnary: false
+      })
+    });
+
+
+    it('parse interpolation', () => {
+      const template = '<div>{{foo}}</div>'
+      const ast = parse(template)
+      expect(ast[0]).toEqual({
+        tag: 'div',
+        type: 'Element',
+        props: [],
+        children: [
+          {
+            type: 'Interpolation',
+            content: {
+              type: 'Expression',
+              content: 'foo'
+            }
+          }
+        ],
+        isUnary: false
+      })
+    });
+
+
+    
+    it("generate element with text", () => {
+      const ast = [
+        {
+          type: "Element",
+          tag: "div",
+          props: [],
+          isUnary: false,
+          children: [{ type: "Text", content: "foo" }],
+        },
+      ];
+      const code = generate(ast);
+      expect(code).toMatch(`return this._c('div',null,'foo')`);
+    });
+    
+    it("generate element with expression", () => {
+      const ast = [
+        {
+          type: "Element",
+          tag: "div",
+          props: [],
+          isUnary: false,
+          children: [
+            {
+              type: "Interpolation",
+              content: { type: "Expression", content: "foo" },
+            },
+          ],
+        },
+      ];
+      const code = generate(ast);
+      expect(code).toMatch(`return this._c('div',null,this.foo)`);
+    });
+    
+    it("generate element with muti children", () => {
+      const ast = [
+        {
+          type: "Element",
+          tag: "div",
+          props: [],
+          isUnary: false,
+          children: [
+            { type: "Text", content: "foo" },
+            {
+              type: "Element",
+              tag: "span",
+              props: [],
+              isUnary: false,
+              children: [{ type: "Text", content: "bar" }],
+            },
+          ],
+        },
+      ];
+      const code = generate(ast);
+      expect(code).toMatch(
+        `return this._c('div',null,[this._v('foo'),this._c('span',null,'bar')])`
+      );
+    });
+    
 });
