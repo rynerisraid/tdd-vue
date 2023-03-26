@@ -1,0 +1,38 @@
+<html>
+<body>
+    <div id="app">
+        <input v-model="data.message" />
+        <button @click="reverse">{{data.message}}</button>
+    </div>
+<script src="../build/reactivity.js"></script>
+<script src="../build/Complier.js"></script>
+<script>
+    const { reactive, effect } = Reactivity
+    const { compile } = Complier
+    const data = reactive({
+      message: 'Hello Vue 3!!'
+    })
+    function reverse() {
+      data.message = data.message.split('').reverse().join('')
+    }
+    const template = app.innerHTML
+    const render = compile(template)
+    
+    // { type: 'div', children: 'foo' }
+    // const vnode = render.call(data)
+    // renderer.render(vnode, document.getElementById('app'))
+  
+    effect(() => {
+      const vnode = render.call(data)
+      renderer.render(vnode, document.getElementById('app'))
+    })
+
+
+</script>
+
+
+</body>
+</html>
+
+
+
